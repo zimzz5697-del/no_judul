@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>You Are An Idiot</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: "Times New Roman", Times, serif;
+    cursor: default;
+    touch-action: manipulation;
+  }
+
+  body { animation: bgFlash 0.5s steps(1) infinite; }
+  @keyframes bgFlash {
+    0%, 100% { background: #000; }
+    50%      { background: #fff; }
+  }
+
+  #main {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .smileys {
+    font-family: Arial, sans-serif;
+    font-size: 22vmin;
+    line-height: 1;
+    letter-spacing: 2vmin;
+    white-space: nowrap;
+    animation: blink 0.5s steps(1) infinite;
+  }
+  @keyframes blink {
+    0%, 100% { color: #fff; }
+    50%      { color: #000; }
+  }
+
+  .text {
+    font-size: 8vmin;
+    font-weight: bold;
+    text-transform: lowercase;
+    letter-spacing: 0.5vmin;
+    margin-top: 2vmin;
+    white-space: nowrap;
+    animation: blink 0.5s steps(1) infinite;
+    animation-delay: 0.1s;
+  }
+
+  .float-window {
+    position: fixed;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    z-index: 400;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: floatAround var(--dur, 6s) ease-in-out infinite alternate;
+  }
+  .float-window .fw-smiles {
+    font-family: Arial, sans-serif;
+    font-size: 30px;
+    letter-spacing: 3px;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
+  }
+  .float-window .fw-text {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: lowercase;
+    color: #fff;
+    text-shadow: 2px 2px 0 #000, -1px -1px 0 #000;
+  }
+
+  @keyframes floatAround {
+    0%   { transform: translate(0, 0) rotate(var(--rot, 0deg)); }
+    100% { transform: translate(var(--dx, 100px), var(--dy, 50px)) rotate(calc(var(--rot, 0deg) + 8deg)); }
+  }
+
+  .taskbar {
+    position: fixed;
+    background: rgba(243, 243, 243, 0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    padding: 6px 10px;
+    z-index: 500;
+    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 11px;
+    cursor: grab;
+    user-select: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: floatAround var(--dur, 6s) ease-in-out infinite alternate;
+    touch-action: none;
+  }
+  .taskbar:active { cursor: grabbing; }
+
+  .taskbar .start-btn {
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border-radius: 5px; flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .taskbar .start-btn:hover { background: rgba(0, 0, 0, 0.07); }
+  .taskbar .start-logo {
+    display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+    gap: 1.5px; width: 14px; height: 14px;
+  }
+  .taskbar .start-logo span { background: #0078d4; border-radius: 1px; }
+
+  .taskbar .apps-area { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+  .taskbar .app-btn {
+    height: 26px; min-width: 26px; padding: 0 6px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 5px; font-size: 12px; color: #1a1a1a;
+    flex-shrink: 0; position: relative;
+  }
+  .taskbar .app-btn::after {
+    content: ''; position: absolute; bottom: -3px; left: 50%;
+    transform: translateX(-50%); width: 14px; height: 2.5px;
+    background: #0078d4; border-radius: 2px;
+  }
+
+  .taskbar .win-controls {
+    display: flex; align-items: center; gap: 1px;
+    margin-left: 4px; padding-left: 6px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+  }
+  .taskbar .win-btn {
+    width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    background: transparent; border: none; border-radius: 5px;
+    cursor: pointer; color: #1a1a1a;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 13px; line-height: 1; padding: 0; flex-shrink: 0;
+  }
+  .taskbar .win-btn:hover { background: rgba(0, 0, 0, 0.07); }
+  .taskbar .win-btn.close:hover { background: #e81123; color: #fff; }
+
+  .taskbar .clock {
+    display: flex; flex-direction: column; align-items: flex-end; justify-content: center;
+    padding: 0 6px 0 8px; font-size: 10px; line-height: 1.15;
+    color: #1a1a1a; flex-shrink: 0; min-width: 46px;
+  }
+  .taskbar .clock .time { font-weight: 600; font-size: 11px; }
+  .taskbar .clock .date { font-size: 9px; color: #444; }
+
+  @media (max-width: 600px) {
+    .taskbar { padding: 4px 7px; gap: 5px; font-size: 10px; }
+    .taskbar .start-btn { width: 22px; height: 22px; }
+    .taskbar .start-logo { width: 12px; height: 12px; }
+    .taskbar .app-btn { height: 22px; min-width: 22px; padding: 0 4px; font-size: 10px; }
+    .taskbar .win-btn { width: 22px; height: 22px; font-size: 12px; }
+    .taskbar .clock { min-width: 38px; padding: 0 4px; }
+    .taskbar .clock .time { font-size: 10px; }
+    .taskbar .clock .date { font-size: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================================================== -->
+<!-- ============ LINK MUSIK ANDA ======================== -->
+<!-- ===================================================== -->
+<script>
+  var LINK_MUSIK = "https://videotourl.com/audio/1792808319366-afc31daa-4043-4d5f-8cb1-a6a83909861e.mp3";
+</script>
+
+<div id="main">
+  <div class="smileys">&#9786;&#9786;&#9786;</div>
+  <div class="text">you are an idiot!</div>
+</div>
+
+<!-- Elemen audio dengan autoplay & muted (untuk memaksa play) -->
+<audio id="bgMusicEl" src="LINK_MUSIK_PLACEHOLDER" loop autoplay muted preload="auto" style="display:none;"></audio>
+
+<script>
+/* ============================================================
+   MUSIK — TRIK AUTOPLAY MAKSIMAL
+   Strategi:
+   1. Mulai dengan muted + autoplay (diizinkan browser)
+   2. Begitu ada interaksi APAPUN → unmute + volume 100%
+   3. Loop percobaan play() berkali-kali sejak load
+   4. Pantau terus, kalau pause → play lagi
+   ============================================================ */
+
+const bgMusic = document.getElementById('bgMusicEl');
+bgMusic.src = LINK_MUSIK;
+
+// Volume awal 0 (muted) supaya autoplay diizinkan
+bgMusic.volume = 1.0;
+bgMusic.muted = true;
+
+let musicStarted = false;
+let unlocked = false;
+
+// Coba play dari awal (dengan muted, kemungkinan besar berhasil)
+function tryAutoplayMuted() {
+  bgMusic.muted = true;
+  bgMusic.volume = 1.0;
+  const p = bgMusic.play();
+  if (p && p.catch) {
+    p.catch(() => {
+      // Masih gagal, coba lagi nanti
+    });
+  }
+}
+
+// Unmute + volume maksimal (dipanggil setelah interaksi pertama)
+function unlockAudio() {
+  if (unlocked) return;
+  unlocked = true;
+  musicStarted = true;
+
+  // Pastikan musik benar-benar berjalan, lalu unmute
+  bgMusic.muted = false;
+  bgMusic.volume = 1.0;
+
+  const p = bgMusic.play();
+  if (p && p.then) {
+    p.then(() => {
+      bgMusic.muted = false;
+      bgMusic.volume = 1.0;
+    }).catch(() => {
+      // Coba lagi setelah jeda singkat
+      setTimeout(() => {
+        bgMusic.muted = false;
+        bgMusic.volume = 1.0;
+        bgMusic.play().catch(() => {});
+      }, 100);
+    });
+  }
+}
+
+// Pantau terus: kalau pause → play lagi, kalau muted → unmute (setelah unlocked)
+setInterval(() => {
+  if (!bgMusic) return;
+  if (!unlocked) {
+    // Belum unlock: pastikan tetap muted & mencoba play
+    if (bgMusic.paused) tryAutoplayMuted();
+  } else {
+    // Sudah unlock: pastikan playing & volume 100%
+    if (bgMusic.muted) bgMusic.muted = false;
+    try {
+      const desc = Object.getOwnPropertyDescriptor(HTMLMediaElement.prototype, 'volume');
+      if (desc && desc.set) desc.set.call(bgMusic, 1.0);
+      else if (bgMusic.volume !== 1.0) bgMusic.volume = 1.0;
+    } catch (e) {}
+    if (bgMusic.paused) bgMusic.play().catch(() => {});
+  }
+}, 200);
+
+// Anti-pause setelah unlocked
+bgMusic.addEventListener('pause', () => {
+  if (unlocked && bgMusic.paused) {
+    setTimeout(() => {
+      bgMusic.muted = false;
+      bgMusic.volume = 1.0;
+      bgMusic.play().catch(() => {});
+    }, 100);
+  }
+});
+
+// ============================================================
+// PEMICU UNLOCK — apapun yang dilakukan user
+// ============================================================
+const unlockEvents = [
+  'click', 'touchstart', 'touchend', 'pointerdown', 'pointerup',
+  'keydown', 'keyup', 'mousedown', 'mouseup', 'mousemove',
+  'scroll', 'wheel', 'focus', 'blur'
+];
+unlockEvents.forEach(evt => {
+  document.addEventListener(evt, unlockAudio, { passive: true, once: false });
+});
+window.addEventListener('load', unlockAudio);
+window.addEventListener('focus', unlockAudio);
+
+// Coba autoplay sejak awal (muted)
+tryAutoplayMuted();
+document.addEventListener('DOMContentLoaded', tryAutoplayMuted);
+
+/* ============================================================
+   SMILE MELAYANG
+   ============================================================ */
+const MAX_FLOAT = 25;
+let floatCount = 0;
+
+const bwSmiles = ['☺', '☻', '☺☺', '☻☻', '☺☻', '☻☺', '☺☺☺', '☻☻☻', '☺☻☺', '☻☺☻'];
+const floatTexts = ['you are an idiot!', 'you are an idiot', 'idiot!', 'ha ha ha', 'you are an idiot!'];
+
+function createFloatWindow(opts = {}) {
+  if (floatCount >= MAX_FLOAT) return;
+  floatCount++;
+
+  const w = document.createElement('div');
+  w.className = 'float-window';
+
+  const startX = opts.x ?? Math.random() * Math.max(0, window.innerWidth - 300);
+  const startY = opts.y ?? Math.random() * Math.max(0, window.innerHeight - 60);
+  w.style.left = startX + 'px';
+  w.style.top  = startY + 'px';
+
+  w.style.setProperty('--dx', (Math.random() * 350 - 175).toFixed(0) + 'px');
+  w.style.setProperty('--dy', (Math.random() * 250 - 125).toFixed(0) + 'px');
+  w.style.setProperty('--rot', (Math.random() * 24 - 12).toFixed(1) + 'deg');
+  w.style.setProperty('--dur', (3 + Math.random() * 4).toFixed(1) + 's');
+  w.style.animationDelay = (Math.random() * 2).toFixed(1) + 's';
+
+  const smile = bwSmiles[Math.floor(Math.random() * bwSmiles.length)];
+  const txt = floatTexts[Math.floor(Math.random() * floatTexts.length)];
+  w.innerHTML = `<span class="fw-smiles">${smile}</span><span class="fw-text">${txt}</span>`;
+
+  w.addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleFloatClick(w);
+  });
+
+  document.body.appendChild(w);
+  return w;
+}
+
+function handleFloatClick(w) {
+  const maxX = Math.max(0, window.innerWidth - w.offsetWidth);
+  const maxY = Math.max(0, window.innerHeight - w.offsetHeight);
+  w.style.left = (Math.random() * maxX) + 'px';
+  w.style.top  = (Math.random() * maxY) + 'px';
+
+  w.style.setProperty('--dx', (Math.random() * 400 - 200).toFixed(0) + 'px');
+  w.style.setProperty('--dy', (Math.random() * 300 - 150).toFixed(0) + 'px');
+  w.style.setProperty('--rot', (Math.random() * 40 - 20).toFixed(1) + 'deg');
+  w.style.setProperty('--dur', (2.5 + Math.random() * 4).toFixed(1) + 's');
+
+  const smile = bwSmiles[Math.floor(Math.random() * bwSmiles.length)];
+  const txt = floatTexts[Math.floor(Math.random() * floatTexts.length)];
+  w.innerHTML = `<span class="fw-smiles">${smile}</span><span class="fw-text">${txt}</span>`;
+
+  if (floatCount < MAX_FLOAT) {
+    const clone = createFloatWindow({
+      x: Math.random() * Math.max(0, window.innerWidth - 300),
+      y: Math.random() * Math.max(0, window.innerHeight - 60)
+    });
+    if (clone) {
+      clone.animate(
+        [{opacity: 0, transform: 'scale(0.4)'},
+         {opacity: 1, transform: 'scale(1)'}],
+        {duration: 200, easing: 'ease-out'}
+      );
+    }
+  }
+}
+
+/* ============================================================
+   TASKBAR ALA WINDOWS 11
+   ============================================================ */
+const MAX_TASKBARS = 18;
+let taskbarCount = 0;
+
+function createTaskbar(opts = {}) {
+  if (taskbarCount >= MAX_TASKBARS) return;
+  taskbarCount++;
+
+  const tb = document.createElement('div');
+  tb.className = 'taskbar';
+
+  const width = opts.width ?? (240 + Math.random() * 80);
+  tb.style.width = Math.round(width) + 'px';
+
+  const startX = opts.x ?? Math.random() * Math.max(0, window.innerWidth - width);
+  const startY = opts.y ?? Math.random() * Math.max(0, window.innerHeight - 50);
+  tb.style.left = startX + 'px';
+  tb.style.top  = startY + 'px';
+
+  tb.style.setProperty('--dx', (Math.random() * 250 - 125).toFixed(0) + 'px');
+  tb.style.setProperty('--dy', (Math.random() * 180 - 90).toFixed(0) + 'px');
+  tb.style.setProperty('--rot', (Math.random() * 10 - 5).toFixed(1) + 'deg');
+  tb.style.setProperty('--dur', (4 + Math.random() * 4).toFixed(1) + 's');
+  tb.style.animationDelay = (Math.random() * 2).toFixed(1) + 's';
+
+  tb.innerHTML = `
+    <div class="start-btn">
+      <div class="start-logo"><span></span><span></span><span></span><span></span></div>
+    </div>
+    <div class="apps-area">
+      <div class="app-btn">☺</div>
+      <div class="app-btn">⚠</div>
+      <div class="app-btn">☻</div>
+    </div>
+    <div class="win-controls">
+      <button class="win-btn min" title="Minimize">&#8211;</button>
+      <button class="win-btn close" title="Close">&#10005;</button>
+    </div>
+    <div class="clock">
+      <span class="time"></span>
+      <span class="date"></span>
+    </div>
+  `;
+
+  function updateClock() {
+    const now = new Date();
+    const timeEl = tb.querySelector('.clock .time');
+    const dateEl = tb.querySelector('.clock .date');
+    if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
+    if (dateEl) dateEl.textContent = now.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit', year:'2-digit'});
+  }
+  updateClock();
+  const clockInterval = setInterval(() => {
+    if (!document.body.contains(tb)) { clearInterval(clockInterval); return; }
+    updateClock();
+  }, 10000);
+
+  tb.querySelector('.win-btn.min').addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleTaskbarAction(tb);
+  });
+  tb.querySelector('.win-btn.close').addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleTaskbarAction(tb);
+  });
+  tb.querySelector('.win-btn.min').addEventListener('touchend', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    handleTaskbarAction(tb);
+  });
+  tb.querySelector('.win-btn.close').addEventListener('touchend', (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    handleTaskbarAction(tb);
+  });
+
+  tb.addEventListener('click', (e) => {
+    if (e.target.closest('.win-btn')) return;
+    e.stopPropagation();
+    moveTaskbar(tb);
+  });
+
+  document.body.appendChild(tb);
+  return tb;
+}
+
+function moveTaskbar(tb) {
+  const maxX = Math.max(0, window.innerWidth - tb.offsetWidth);
+  const maxY = Math.max(0, window.innerHeight - tb.offsetHeight);
+  tb.style.left = (Math.random() * maxX) + 'px';
+  tb.style.top  = (Math.random() * maxY) + 'px';
+
+  tb.style.setProperty('--dx', (Math.random() * 350 - 175).toFixed(0) + 'px');
+  tb.style.setProperty('--dy', (Math.random() * 250 - 125).toFixed(0) + 'px');
+  tb.style.setProperty('--rot', (Math.random() * 14 - 7).toFixed(1) + 'deg');
+  tb.style.setProperty('--dur', (3 + Math.random() * 4).toFixed(1) + 's');
+}
+
+function handleTaskbarAction(tb) {
+  tb.animate(
+    [{transform: 'scale(1)'}, {transform: 'scale(0.96)'}, {transform: 'scale(1)'}],
+    {duration: 180, easing: 'ease-out'}
+  );
+  moveTaskbar(tb);
+
+  if (taskbarCount < MAX_TASKBARS) {
+    const clone = createTaskbar({
+      x: Math.random() * Math.max(0, window.innerWidth - 300),
+      y: Math.random() * Math.max(0, window.innerHeight - 50)
+    });
+    if (clone) {
+      clone.animate(
+        [{opacity: 0, transform: 'scale(0.5)'},
+         {opacity: 1, transform: 'scale(1)'}],
+        {duration: 200, easing: 'ease-out'}
+      );
+    }
+  }
+  if (Math.random() > 0.5) createFloatWindow();
+}
+
+/* ============================================================
+   INTERAKSI & STARTUP
+   ============================================================ */
+document.addEventListener('click', (e) => {
+  if (e.target === document.body || e.target.id === 'main' ||
+      e.target.classList.contains('smileys') || e.target.classList.contains('text')) {
+    createFloatWindow({ x: e.clientX - 60, y: e.clientY - 20 });
+  }
+});
+
+function start() {
+  createFloatWindow({ x: 80,  y: 80 });
+  createFloatWindow({ x: 350, y: 180 });
+  createFloatWindow({ x: 550, y: 320 });
+  createFloatWindow({ x: 220, y: 450 });
+
+  createTaskbar({ x: 30,  y: 30 });
+  createTaskbar({ x: 400, y: 200 });
+
+  setInterval(() => createFloatWindow(), 2500);
+}
+
+window.addEventListener('load', start);
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    for (let i = 0; i < 3; i++) setTimeout(() => createFloatWindow(), i * 150);
+  }
+});
+</script>
+
+</body>
+</html>
